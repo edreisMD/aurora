@@ -80,6 +80,38 @@ Future<dynamic> gptApiCall({
       isEmbedding: urlSuffix == 'embeddings', isFunctionCalling: tools.isNotEmpty);
 }
 
+Future<List<String>> searchExaForContent(String summary) async {
+  const String apiKey = Env.exaApiKey; // Replace with your actual API key
+  final Uri exaEndpoint = Uri.parse('https://api.exa.ai/search'); // Exa search endpoint
+
+  final query = summary; // Combining title and summary for the query
+  final response = await http.post(
+    exaEndpoint,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $apiKey',
+    },
+    body: jsonEncode({
+      'query': query,
+      'type': 'neural', // You can choose 'keyword', 'neural', or 'magic' based on your preference
+      'numResults': 10, // Adjust the number of results as needed
+      // Include additional parameters as required by your application
+      // For example, 'startPublishedDate': '2023-01-01T00:00:00Z',
+      // 'endPublishedDate': '2023-12-31T23:59:59Z',
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    // Assuming the API returns a JSON array of objects with a 'url' field
+    final List<dynamic> results = jsonDecode(response.body);
+    return results.map((result) => result['url'].toString()).toList();
+  } else {
+    // Handle errors or unexpected responses
+    debugPrint('Failed to fetch data from Exa with status code ${response.statusCode}: ${response.reasonPhrase}');
+    return [];
+  }
+}
+
 Future<String> executeGptPrompt(String? prompt) async {
   if (prompt == null) return '';
 
@@ -92,7 +124,10 @@ Future<String> executeGptPrompt(String? prompt) async {
     {'role': 'system', 'content': prompt}
   ]);
   prefs.setString(promptBase64, response);
-  return response;
+
+  List<String> exaResults = await searchExaForContent(response);
+
+  return exaResults.join('\n');
 }
 
 Future<String> generateTitleAndSummaryForMemory(String? memory) async {

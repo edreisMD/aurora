@@ -17,6 +17,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'home_page_model.dart';
 export 'home_page_model.dart';
+// import 'package:sama/twiter_feed.dart'; // Import TwitterFeedView
+// import 'package:sama/controllers/twitter_feed.dart'; // Adjust the import path as necessary
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({super.key});
@@ -183,6 +185,10 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       ),
                               ),
                             ),
+                            // Padding(
+                            //   padding: const EdgeInsets.all(8.0),
+                            //   child: TwitterFeedView(controller: controller), // Display Twitter feed
+                            // ),
                           ],
                         ),
                       ),

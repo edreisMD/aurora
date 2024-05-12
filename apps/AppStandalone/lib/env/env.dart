@@ -36,4 +36,7 @@ abstract class Env {
   // Revenue Cat (Optional)
   @EnviedField(varName: 'REVENUECAT_API_KEY')
   static const String? revenueCatAPIKey = _Env.revenueCatAPIKey;
+
+  @EnviedField(varName: 'EXA_API_KEY')
+  static const String? exaAPIKey = _Env.exaAPIKey;
 }

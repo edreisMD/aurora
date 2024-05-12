@@ -17,14 +17,62 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'home_page_model.dart';
 export 'home_page_model.dart';
-// import 'package:sama/twiter_feed.dart'; // Import TwitterFeedView
-// import 'package:sama/controllers/twitter_feed.dart'; // Adjust the import path as necessary
+import 'package:webview_flutter/webview_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:sama/twiter_feed.dart';
+import 'package:sama/controllers/twitter_feed.dart'; // Adjust the import path as necessary
 
 class HomePageWidget extends StatefulWidget {
   const HomePageWidget({super.key});
 
   @override
   State<HomePageWidget> createState() => _HomePageWidgetState();
+}
+
+class TweetCard extends StatelessWidget {
+  final String tweetUrl;
+  final String tweetPreviewText; // Optional: For displaying tweet text preview
+
+  const TweetCard({
+    Key? key,
+    required this.tweetUrl,
+    this.tweetPreviewText = '', // Default to empty if not provided
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      child: InkWell(
+        onTap: () => _launchURL(tweetUrl),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (tweetPreviewText.isNotEmpty)
+                Text(
+                  tweetPreviewText,
+                  style: TextStyle(fontSize: 16.0),
+                ),
+              SizedBox(height: 8.0),
+              Text(
+                tweetUrl,
+                style: TextStyle(color: Colors.blue, decoration: TextDecoration.underline),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _launchURL(String url) async {
+    if (await canLaunch(url)) {
+      await launch(url);
+    } else {
+      throw 'Could not launch $url';
+    }
+  }
 }
 
 class _HomePageWidgetState extends State<HomePageWidget> {
@@ -138,12 +186,12 @@ class _HomePageWidgetState extends State<HomePageWidget> {
               mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                HomePageSummariesButtons(
-                  model: _model,
-                  dailySummary: dailySummary,
-                  weeklySummary: weeklySummary,
-                  monthlySummary: monthlySummary,
-                ),
+                // HomePageSummariesButtons(
+                //   model: _model,
+                //   dailySummary: dailySummary,
+                //   weeklySummary: weeklySummary,
+                //   monthlySummary: monthlySummary,
+                // ),
                 Expanded(
                   child: Stack(
                     alignment: const AlignmentDirectional(0.0, 1.0),
@@ -157,7 +205,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                               padding: const EdgeInsetsDirectional.fromSTEB(16.0, 4.0, 16.0, 0.0),
                               child: Container(
                                 width: double.infinity,
-                                height: MediaQuery.sizeOf(context).height * 0.7,
+                                height: MediaQuery.of(context).size.height * 0.7,
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(12.0),
                                   shape: BoxShape.rectangle,
@@ -168,8 +216,8 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                 child: (FFAppState().memories.isEmpty && !FFAppState().memoryCreationProcessing)
                                     ? Center(
                                         child: SizedBox(
-                                          width: MediaQuery.sizeOf(context).width * 1.0,
-                                          height: MediaQuery.sizeOf(context).height * 0.4,
+                                          width: MediaQuery.of(context).size.width * 1.0,
+                                          height: MediaQuery.of(context).size.height * 0.4,
                                           child: const EmptyMemoriesWidget(),
                                         ),
                                       )
@@ -185,10 +233,7 @@ class _HomePageWidgetState extends State<HomePageWidget> {
                                       ),
                               ),
                             ),
-                            // Padding(
-                            //   padding: const EdgeInsets.all(8.0),
-                            //   child: TwitterFeedView(controller: controller), // Display Twitter feed
-                            // ),
+                            // TwitterFeedView(controller: controller)
                           ],
                         ),
                       ),

@@ -89,21 +89,24 @@ Future<List<String>> searchExaForContent(String summary) async {
     exaEndpoint,
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer $apiKey',
+      'x-api-key': '$apiKey',
     },
     body: jsonEncode({
       'query': query,
       'type': 'neural', // You can choose 'keyword', 'neural', or 'magic' based on your preference
-      'numResults': 10, // Adjust the number of results as needed
+      'numResults': 10,
+      'category': 'tweet' // Adjust the number of results as needed
       // Include additional parameters as required by your application
       // For example, 'startPublishedDate': '2023-01-01T00:00:00Z',
       // 'endPublishedDate': '2023-12-31T23:59:59Z',
     }),
   );
 
+  debugPrint('Exa API Response: ${response.body}');
+
   if (response.statusCode == 200) {
-    // Assuming the API returns a JSON array of objects with a 'url' field
-    final List<dynamic> results = jsonDecode(response.body);
+    final Map<String, dynamic> decodedBody = jsonDecode(response.body);
+    final List<dynamic> results = decodedBody['results'];
     return results.map((result) => result['url'].toString()).toList();
   } else {
     // Handle errors or unexpected responses
@@ -127,7 +130,7 @@ Future<String> executeGptPrompt(String? prompt) async {
 
   List<String> exaResults = await searchExaForContent(response);
 
-  return exaResults.join('\n');
+  return exaResults[0];
 }
 
 Future<String> generateTitleAndSummaryForMemory(String? memory) async {

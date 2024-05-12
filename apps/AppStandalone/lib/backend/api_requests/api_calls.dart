@@ -81,7 +81,7 @@ Future<dynamic> gptApiCall({
 }
 
 Future<List<String>> searchExaForContent(String summary) async {
-  const String apiKey = Env.exaApiKey; // Replace with your actual API key
+  const apiKey = Env.exaAPIKey; // Replace with your actual API key
   final Uri exaEndpoint = Uri.parse('https://api.exa.ai/search'); // Exa search endpoint
 
   final query = summary; // Combining title and summary for the query
